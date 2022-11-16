@@ -1,6 +1,8 @@
-import minitorch
 import pytest
 from hypothesis import given
+
+import minitorch
+
 from .strategies import med_ints, small_floats
 
 # # Tests for module.py
@@ -128,6 +130,7 @@ def test_stacked_module(size_a, size_b, val):
     assert len(module.parameters()) == 1 + (size_a + 3) + (size_b + 3)
 
     named_parameters = dict(module.named_parameters())
+    print(named_parameters)
     assert named_parameters["parameter_a"].value == val
     assert named_parameters["module_a.parameter_a"].value == VAL_A
     assert named_parameters["module_a.parameter_b"].value == VAL_B
