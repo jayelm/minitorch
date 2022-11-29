@@ -1,7 +1,7 @@
-from .autodiff import FunctionBase, Variable, History
-from . import operators
 import numpy as np
 
+from . import operators
+from .autodiff import FunctionBase, History, Variable
 
 # ## Task 1.1
 # Central Difference calculation
@@ -22,8 +22,10 @@ def central_difference(f, *vals, arg=0, epsilon=1e-6):
     Returns:
         float : An approximation of :math:`f'_i(x_0, \ldots, x_{n-1})`
     """
-    # TODO: Implement for Task 1.1.
-    raise NotImplementedError('Need to implement for Task 1.1')
+    res_f = f(*vals)
+    vals_plus_epsilon = [v + epsilon if i == arg else v for i, v in enumerate(vals)]
+    res_f_plus_e = f(*vals_plus_epsilon)
+    return (res_f_plus_e - res_f) / epsilon
 
 
 # ## Task 1.2 and 1.4
