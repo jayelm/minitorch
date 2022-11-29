@@ -1,11 +1,7 @@
 import numpy as np
-from .tensor_data import (
-    to_index,
-    index_to_position,
-    broadcast_index,
-    shape_broadcast,
-    MAX_DIMS,
-)
+
+from .tensor_data import (MAX_DIMS, broadcast_index, index_to_position,
+                          shape_broadcast, to_index)
 
 
 def tensor_map(fn):
@@ -40,7 +36,7 @@ def tensor_map(fn):
 
     def _map(out, out_shape, out_strides, in_storage, in_shape, in_strides):
         # TODO: Implement for Task 2.2.
-        raise NotImplementedError('Need to implement for Task 2.2')
+        raise NotImplementedError("Need to implement for Task 2.2")
 
     return _map
 
@@ -131,7 +127,7 @@ def tensor_zip(fn):
         b_strides,
     ):
         # TODO: Implement for Task 2.2.
-        raise NotImplementedError('Need to implement for Task 2.2')
+        raise NotImplementedError("Need to implement for Task 2.2")
 
     return _zip
 
@@ -202,7 +198,7 @@ def tensor_reduce(fn):
 
     def _reduce(out, out_shape, out_strides, a_storage, a_shape, a_strides, reduce_dim):
         # TODO: Implement for Task 2.2.
-        raise NotImplementedError('Need to implement for Task 2.2')
+        raise NotImplementedError("Need to implement for Task 2.2")
 
     return _reduce
 

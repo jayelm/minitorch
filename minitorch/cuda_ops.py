@@ -1,13 +1,8 @@
-from numba import cuda
 import numba
-from .tensor_data import (
-    to_index,
-    index_to_position,
-    TensorData,
-    broadcast_index,
-    shape_broadcast,
-    MAX_DIMS,
-)
+from numba import cuda
+
+from .tensor_data import (MAX_DIMS, TensorData, broadcast_index,
+                          index_to_position, shape_broadcast, to_index)
 
 # This code will CUDA compile fast versions your tensor_data functions.
 # If you get an error, read the docs for NUMBA as to what is allowed
@@ -43,7 +38,7 @@ def tensor_map(fn):
 
     def _map(out, out_shape, out_strides, out_size, in_storage, in_shape, in_strides):
         # TODO: Implement for Task 3.3.
-        raise NotImplementedError('Need to implement for Task 3.3')
+        raise NotImplementedError("Need to implement for Task 3.3")
 
     return cuda.jit()(_map)
 
@@ -102,7 +97,7 @@ def tensor_zip(fn):
         b_strides,
     ):
         # TODO: Implement for Task 3.3.
-        raise NotImplementedError('Need to implement for Task 3.3')
+        raise NotImplementedError("Need to implement for Task 3.3")
 
     return cuda.jit()(_zip)
 
@@ -146,7 +141,7 @@ def _sum_practice(out, a, size):
     """
     BLOCK_DIM = 32
     # TODO: Implement for Task 3.3.
-    raise NotImplementedError('Need to implement for Task 3.3')
+    raise NotImplementedError("Need to implement for Task 3.3")
 
 
 jit_sum_practice = cuda.jit()(_sum_practice)
@@ -196,7 +191,7 @@ def tensor_reduce(fn):
     ):
         BLOCK_DIM = 1024
         # TODO: Implement for Task 3.3.
-        raise NotImplementedError('Need to implement for Task 3.3')
+        raise NotImplementedError("Need to implement for Task 3.3")
 
     return cuda.jit()(_reduce)
 
@@ -273,7 +268,7 @@ def _mm_practice(out, a, b, size):
     """
     BLOCK_DIM = 32
     # TODO: Implement for Task 3.3.
-    raise NotImplementedError('Need to implement for Task 3.3')
+    raise NotImplementedError("Need to implement for Task 3.3")
 
 
 jit_mm_practice = cuda.jit()(_mm_practice)
@@ -337,7 +332,7 @@ def tensor_matrix_multiply(
     b_batch_stride = b_strides[0] if b_shape[0] > 1 else 0
     BLOCK_DIM = 32
     # TODO: Implement for Task 3.4.
-    raise NotImplementedError('Need to implement for Task 3.4')
+    raise NotImplementedError("Need to implement for Task 3.4")
 
 
 def matrix_multiply(a, b):
