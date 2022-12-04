@@ -1,3 +1,5 @@
+from collections import Counter, defaultdict, deque
+
 variable_count = 1
 
 
@@ -190,8 +192,7 @@ class History:
         Returns:
             list of numbers : a derivative with respect to `inputs`
         """
-        # TODO: Implement for Task 1.4.
-        raise NotImplementedError("Need to implement for Task 1.4")
+        return self.last_fn.chain_rule(self.ctx, self.inputs, d_output)
 
 
 class FunctionBase:
@@ -301,8 +302,23 @@ def topological_sort(variable):
         list of Variables : Non-constant Variables in topological order
                             starting from the right.
     """
-    # TODO: Implement for Task 1.4.
-    raise NotImplementedError("Need to implement for Task 1.4")
+    ordered = deque()
+    visited = defaultdict(lambda: False)
+
+    def visit(v):
+        if visited[v.name]:
+            return
+        # DFS on other values. Then prepend this one to the list.
+        visited[v.name] = True
+        if not v.is_leaf():
+            for input_v in v.history.inputs:
+                if not is_constant(input_v):
+                    visit(input_v)
+        ordered.appendleft(v)
+
+    visit(variable)
+
+    return ordered
 
 
 def backpropagate(variable, deriv):
@@ -318,5 +334,16 @@ def backpropagate(variable, deriv):
 
     No return. Should write to its results to the derivative values of each leaf through `accumulate_derivative`.
     """
-    # TODO: Implement for Task 1.4.
-    raise NotImplementedError("Need to implement for Task 1.4")
+    variables = topological_sort(variable)
+    derivatives = Counter()
+    derivatives[variable.name] = deriv
+
+    while variables:
+        var = variables.popleft()
+
+        if var.is_leaf():
+            var.accumulate_derivative(derivatives[var.name])
+        else:
+            var_derivatives = var.history.backprop_step(derivatives[var.name])
+            for input_var, input_var_deriv in var_derivatives:
+                derivatives[input_var.name] += input_var_deriv
