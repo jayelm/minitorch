@@ -156,6 +156,13 @@ class Add(ScalarFunction):
 
     @staticmethod
     def backward(ctx, d_output):
+        # Some comments here:
+        # The first d_output is f'_x(x, y). i.e., what is derivative of x + y,
+        # w.r.t x, i.e. y is a constant. Then obviously it's 1.
+        # But in our case we are computing d * f'_(x, y), i.e. what is
+        # derivative of d(x + y), i.e. dx + dy, where y is constant again (so we
+        # throw it away). Then the derivative is clearly just d, which is true
+        # for both a and b.
         return d_output, d_output
 
 
@@ -181,12 +188,13 @@ class Mul(ScalarFunction):
 
     @staticmethod
     def forward(ctx, a, b):
+        ctx.save_for_backward((a, b))
         return operators.mul(a, b)
 
     @staticmethod
     def backward(ctx, d_output):
-        # TODO: Implement for Task 1.4.
-        raise NotImplementedError("Need to implement for Task 1.4")
+        a, b = ctx.saved_values
+        return d_output * b, d_output * a
 
 
 class Inv(ScalarFunction):
@@ -194,12 +202,15 @@ class Inv(ScalarFunction):
 
     @staticmethod
     def forward(ctx, a):
+        ctx.save_for_backward(a)
         return operators.inv(a)
 
     @staticmethod
     def backward(ctx, d_output):
-        # TODO: Implement for Task 1.4.
-        raise NotImplementedError("Need to implement for Task 1.4")
+        a = ctx.saved_values
+        # d_output * - (1 / (a * a))
+        # d/da d * 1/a = d * (-1/(a^2))
+        return d_output * operators.neg(operators.inv(operators.mul(a, a)))
 
 
 class Neg(ScalarFunction):
@@ -211,8 +222,8 @@ class Neg(ScalarFunction):
 
     @staticmethod
     def backward(ctx, d_output):
-        # TODO: Implement for Task 1.4.
-        raise NotImplementedError("Need to implement for Task 1.4")
+        # d/da (-a) = -1
+        return -d_output
 
 
 class Sigmoid(ScalarFunction):
@@ -220,12 +231,22 @@ class Sigmoid(ScalarFunction):
 
     @staticmethod
     def forward(ctx, a):
-        return operators.sigmoid(a)
+        res = operators.sigmoid(a)
+        # Sigmoid func is used in the computation of the derivative.
+        ctx.save_for_backward(res)
+        return res
 
     @staticmethod
     def backward(ctx, d_output):
-        # TODO: Implement for Task 1.4.
-        raise NotImplementedError("Need to implement for Task 1.4")
+        # d/da (1 / (1 + exp(-a)))
+        # chain rule: 
+        # -1 * (1 / (1 + exp(-a))^2) * (- (exp (-a)))
+        # exp(-a) / (1 + (exp(-a))^2)
+        # That's the above form, but with simplification it becomes
+        # ... with simplification this becomes  
+        # https://towardsdatascience.com/derivative-of-the-sigmoid-function-536880cf918e
+        res = ctx.saved_values
+        return res * (1 - res)
 
 
 class ReLU(ScalarFunction):
@@ -233,12 +254,16 @@ class ReLU(ScalarFunction):
 
     @staticmethod
     def forward(ctx, a):
+        ctx.save_for_backward(a)
         return operators.relu(a)
 
     @staticmethod
     def backward(ctx, d_output):
-        # TODO: Implement for Task 1.4.
-        raise NotImplementedError("Need to implement for Task 1.4")
+        a = ctx.saved_values
+        if a > 0:
+            return d_output
+        # Convention: if a == 0, just return 0.
+        return 0.0
 
 
 class Exp(ScalarFunction):
@@ -246,12 +271,16 @@ class Exp(ScalarFunction):
 
     @staticmethod
     def forward(ctx, a):
-        return operators.exp(a)
+        # You can save some compute by saving the exponentiated a, since that is
+        # exactly the derivative when backward is called.
+        a_exp = operators.exp(a)
+        ctx.save_for_backward(a_exp)
+        return a_exp
 
     @staticmethod
     def backward(ctx, d_output):
-        # TODO: Implement for Task 1.4.
-        raise NotImplementedError("Need to implement for Task 1.4")
+        a_exp = ctx.saved_values
+        return d_output * a_exp
 
 
 class LT(ScalarFunction):
@@ -263,8 +292,7 @@ class LT(ScalarFunction):
 
     @staticmethod
     def backward(ctx, d_output):
-        # TODO: Implement for Task 1.4.
-        raise NotImplementedError("Need to implement for Task 1.4")
+        return 0.
 
 
 class EQ(ScalarFunction):
@@ -276,8 +304,7 @@ class EQ(ScalarFunction):
 
     @staticmethod
     def backward(ctx, d_output):
-        # TODO: Implement for Task 1.4.
-        raise NotImplementedError("Need to implement for Task 1.4")
+        return 0.
 
 
 def derivative_check(f, *scalars):

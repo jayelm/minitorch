@@ -274,9 +274,7 @@ class FunctionBase:
         """
         res = cls.backward(ctx, d_output)
         if not isinstance(res, tuple):
-            res = res(
-                res,
-            )
+            res = (res,)
         derivatives = []
         for d, inp in zip(res, inputs):
             if not is_constant(inp):
