@@ -208,9 +208,7 @@ class Inv(ScalarFunction):
     @staticmethod
     def backward(ctx, d_output):
         a = ctx.saved_values
-        # d_output * - (1 / (a * a))
-        # d/da d * 1/a = d * (-1/(a^2))
-        return d_output * operators.neg(operators.inv(operators.mul(a, a)))
+        return operators.inv_back(a, d_output)
 
 
 class Neg(ScalarFunction):
@@ -239,14 +237,14 @@ class Sigmoid(ScalarFunction):
     @staticmethod
     def backward(ctx, d_output):
         # d/da (1 / (1 + exp(-a)))
-        # chain rule: 
+        # chain rule:
         # -1 * (1 / (1 + exp(-a))^2) * (- (exp (-a)))
         # exp(-a) / (1 + (exp(-a))^2)
         # That's the above form, but with simplification it becomes
-        # ... with simplification this becomes  
+        # ... with simplification this becomes
         # https://towardsdatascience.com/derivative-of-the-sigmoid-function-536880cf918e
         res = ctx.saved_values
-        return res * (1 - res)
+        return d_output * res * (1 - res)
 
 
 class ReLU(ScalarFunction):
@@ -260,10 +258,7 @@ class ReLU(ScalarFunction):
     @staticmethod
     def backward(ctx, d_output):
         a = ctx.saved_values
-        if a > 0:
-            return d_output
-        # Convention: if a == 0, just return 0.
-        return 0.0
+        return operators.relu_back(a, d_output)
 
 
 class Exp(ScalarFunction):
@@ -292,7 +287,7 @@ class LT(ScalarFunction):
 
     @staticmethod
     def backward(ctx, d_output):
-        return 0.
+        return 0.0
 
 
 class EQ(ScalarFunction):
@@ -304,7 +299,7 @@ class EQ(ScalarFunction):
 
     @staticmethod
     def backward(ctx, d_output):
-        return 0.
+        return 0.0
 
 
 def derivative_check(f, *scalars):
