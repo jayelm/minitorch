@@ -304,10 +304,10 @@ def topological_sort(variable):
     visited = defaultdict(lambda: False)
 
     def visit(v):
-        if visited[v.name]:
+        if visited[v.unique_id]:
             return
         # DFS on other values. Then prepend this one to the list.
-        visited[v.name] = True
+        visited[v.unique_id] = True
         if not v.is_leaf():
             for input_v in v.history.inputs:
                 if not is_constant(input_v):
@@ -334,14 +334,14 @@ def backpropagate(variable, deriv):
     """
     variables = topological_sort(variable)
     derivatives = Counter()
-    derivatives[variable.name] = deriv
+    derivatives[variable.unique_id] = deriv
 
     while variables:
         var = variables.popleft()
 
         if var.is_leaf():
-            var.accumulate_derivative(derivatives[var.name])
+            var.accumulate_derivative(derivatives[var.unique_id])
         else:
-            var_derivatives = var.history.backprop_step(derivatives[var.name])
+            var_derivatives = var.history.backprop_step(derivatives[var.unique_id])
             for input_var, input_var_deriv in var_derivatives:
-                derivatives[input_var.name] += input_var_deriv
+                derivatives[input_var.unique_id] += input_var_deriv
